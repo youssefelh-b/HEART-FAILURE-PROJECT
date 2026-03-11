@@ -1,7 +1,6 @@
 # ============================================================
 # XGBOOST CLASSIFIER — INTÉGRATION AVEC data_processing.py
 # ============================================================
-# Ce fichier utilise directement le pipeline du collègue.
 # Tâches déjà gérées par data_processing.py (NE PAS REFAIRE) :
 #   ✅ Chargement des données        → load_data()
 #   ✅ Optimisation mémoire          → optimize_memory()
@@ -10,7 +9,7 @@
 #   ✅ Normalisation StandardScaler  → normalize_data()
 #
 # Tâches gérées ICI uniquement :
-#   ✅ Équilibrage SMOTE             → sur X_train_scaled seulement
+#   ✅ Équilibrage SMOTE
 #   ✅ Entraînement XGBoost
 #   ✅ Prédictions + Métriques
 #   ✅ Visualisations
@@ -34,9 +33,7 @@ from sklearn.metrics import (
 )
 from xgboost import XGBClassifier
 from imblearn.over_sampling import SMOTE
-import shap
 
-# 👇 Import du pipeline de ton collègue
 from data_processing import run_pipeline
 
 import warnings
@@ -49,26 +46,14 @@ os.makedirs('results', exist_ok=True)
 # ============================================================
 # 1. EXÉCUTION DU PIPELINE DE data_processing.py
 # ============================================================
-# 👇 REMPLACE uniquement ce chemin par le chemin de ton fichier CSV
-# -------------------------------------------------------------
 DATA_PATH = '../data/heart_failure_clinical_records_dataset.csv'
 
 X_train_scaled, X_test_scaled, y_train, y_test, scaler = run_pipeline(DATA_PATH)
-
-# À ce stade on dispose de :
-#   X_train_scaled → features train  (normalisées, 80%)
-#   X_test_scaled  → features test   (normalisées, 20%)
-#   y_train        → cible train
-#   y_test         → cible test
-#   scaler         → objet StandardScaler ajusté sur le train
 
 
 # ============================================================
 # 2. ÉQUILIBRAGE AVEC SMOTE (sur X_train_scaled uniquement)
 # ============================================================
-# ℹ️ On applique SMOTE APRÈS la normalisation et UNIQUEMENT
-#    sur le train → jamais sur X_test (évite le data leakage)
-# -------------------------------------------------------------
 print("\n" + "=" * 55)
 print("ÉQUILIBRAGE AVEC SMOTE (train uniquement)")
 print("=" * 55)
@@ -90,17 +75,17 @@ print("ENTRAÎNEMENT XGBOOST")
 print("=" * 55)
 
 xgb_model = XGBClassifier(
-    n_estimators=100,       # nombre d'arbres
-    max_depth=4,            # profondeur max de chaque arbre
-    learning_rate=0.1,      # vitesse d'apprentissage
-    subsample=0.8,          # % données utilisées par arbre
-    colsample_bytree=0.8,   # % features utilisées par arbre
+    n_estimators=100,
+    max_depth=4,
+    learning_rate=0.1,
+    subsample=0.8,
+    colsample_bytree=0.8,
     eval_metric='logloss',
     random_state=42
 )
 
 xgb_model.fit(X_train_resampled, y_train_resampled)
-print("✅ Modèle entraîné avec succès !")
+print("✅ Modèle XGBoost entraîné avec succès !")
 
 
 # ============================================================
@@ -126,22 +111,10 @@ f1        = f1_score(y_test, y_pred)
 roc_auc   = roc_auc_score(y_test, y_pred_proba)
 
 print(f"\n📊 Accuracy  : {accuracy:.4f}  ({accuracy*100:.2f}%)")
-print("   → % de prédictions correctes (toutes classes confondues)")
-
 print(f"\n📊 Precision : {precision:.4f}  ({precision*100:.2f}%)")
-print("   → Parmi les prédit positifs, combien sont vraiment positifs ?")
-print("   → Évite les fausses alarmes (Faux Positifs)")
-
 print(f"\n📊 Recall    : {recall:.4f}  ({recall*100:.2f}%)")
-print("   → Parmi tous les vrais positifs, combien sont bien détectés ?")
-print("   → Important en médical : éviter de rater un vrai cas")
-
 print(f"\n📊 F1-Score  : {f1:.4f}  ({f1*100:.2f}%)")
-print("   → Moyenne harmonique Precision + Recall")
-print("   → Meilleure métrique pour données déséquilibrées")
-
 print(f"\n📊 ROC-AUC   : {roc_auc:.4f}  ({roc_auc*100:.2f}%)")
-print("   → 0.5 = aléatoire | 0.8+ = bon | 0.9+ = excellent")
 
 print("\n" + "-" * 55)
 print("RAPPORT COMPLET")
@@ -231,7 +204,7 @@ for bar, value in zip(bars, metrics_values):
 # --- Graphique 4 : Importance des Features ---
 feature_importance = pd.Series(
     xgb_model.feature_importances_,
-    index=X_train_scaled.columns       # noms conservés par normalize_data()
+    index=X_train_scaled.columns
 ).sort_values(ascending=True)
 
 feature_importance.plot(
@@ -250,141 +223,13 @@ print("\n✅ Graphiques sauvegardés → results/xgboost_results.png")
 
 
 # ============================================================
-# 8. PRÉDIRE SUR DE NOUVEAUX PATIENTS (décommenter si besoin)
-# ============================================================
-# ℹ️ Le nouveau patient doit passer par le même scaler
-#    que celui ajusté dans run_pipeline() pour être cohérent
-# -------------------------------------------------------------
-# nouveau_patient = pd.DataFrame({
-#     'age': [65],
-#     'anaemia': [1],
-#     'creatinine_phosphokinase': [250],
-#     'diabetes': [0],
-#     'ejection_fraction': [38],
-#     'high_blood_pressure': [1],
-#     'platelets': [250000],
-#     'serum_creatinine': [1.4],
-#     'serum_sodium': [137],
-#     'sex': [1],
-#     'smoking': [0],
-#     'time': [90]
-# })
-# nouveau_scaled = scaler.transform(nouveau_patient)   # même scaler que run_pipeline
-# prediction     = xgb_model.predict(nouveau_scaled)
-# probabilite    = xgb_model.predict_proba(nouveau_scaled)[:, 1]
-# print(f"Prédiction  : {'Décédé ⚠️' if prediction[0]==1 else 'Survécu ✅'}")
-# print(f"Probabilité : {probabilite[0]*100:.2f}%")
-
-
-# ============================================================
-# 9. ANALYSE SHAP — EXPLICABILITÉ DU MODÈLE
-# ============================================================
-# SHAP (SHapley Additive exPlanations) répond à la question :
-# "Pourquoi le modèle a-t-il prédit CETTE valeur pour CE patient ?"
-#
-# Valeur SHAP positive  → pousse la prédiction vers Décédé (1)
-# Valeur SHAP négative  → pousse la prédiction vers Survécu (0)
-# Valeur SHAP = 0       → la feature n'a eu aucun impact
-# ============================================================
-print("\n" + "=" * 55)
-print("ANALYSE SHAP — EXPLICABILITÉ DU MODÈLE")
-print("=" * 55)
-
-# Calcul des valeurs SHAP sur le jeu de test
-explainer   = shap.Explainer(xgb_model, X_train_resampled)
-shap_values = explainer(X_test_scaled)
-
-print("✅ Valeurs SHAP calculées !")
-
-# Récupérer les noms de colonnes
-feature_names = X_train_scaled.columns.tolist()
-
-# ---- Graphique SHAP 1 : Summary Plot (Beeswarm) ----
-# Montre l'impact de chaque feature sur toutes les prédictions.
-# Chaque point = 1 patient
-# Couleur rouge = valeur haute de la feature
-# Couleur bleue = valeur basse de la feature
-print("\n📊 Graphique 1 : SHAP Summary Plot (Beeswarm)")
-plt.figure(figsize=(10, 6))
-shap.summary_plot(
-    shap_values,
-    X_test_scaled,
-    feature_names=feature_names,
-    show=False
-)
-plt.title("SHAP — Impact de chaque feature sur les prédictions", fontsize=13)
-plt.tight_layout()
-plt.savefig('results/shap_summary_beeswarm.png', dpi=150, bbox_inches='tight')
-plt.show()
-print("   ✅ Sauvegardé → results/shap_summary_beeswarm.png")
-
-# ---- Graphique SHAP 2 : Bar Plot (Importance moyenne) ----
-# Montre l'importance globale de chaque feature
-# = moyenne des valeurs SHAP absolues sur tous les patients
-print("\n📊 Graphique 2 : SHAP Bar Plot (Importance moyenne)")
-plt.figure(figsize=(10, 6))
-shap.summary_plot(
-    shap_values,
-    X_test_scaled,
-    feature_names=feature_names,
-    plot_type='bar',
-    show=False
-)
-plt.title("SHAP — Importance moyenne des features", fontsize=13)
-plt.tight_layout()
-plt.savefig('results/shap_bar_importance.png', dpi=150, bbox_inches='tight')
-plt.show()
-print("   ✅ Sauvegardé → results/shap_bar_importance.png")
-
-# ---- Graphique SHAP 3 : Waterfall (Explication d'1 patient) ----
-# Montre pourquoi le modèle a prédit Décédé ou Survécu
-# pour UN patient précis (ici le patient n°0 du test)
-# E[f(X)] = prédiction de base (moyenne de tous les patients)
-# f(X)    = prédiction finale pour ce patient
-print("\n📊 Graphique 3 : SHAP Waterfall — Explication patient n°0")
-plt.figure(figsize=(10, 6))
-shap.plots.waterfall(shap_values[0], show=False)
-plt.title("SHAP Waterfall — Explication individuelle (patient 0)", fontsize=13)
-plt.tight_layout()
-plt.savefig('results/shap_waterfall_patient0.png', dpi=150, bbox_inches='tight')
-plt.show()
-print("   ✅ Sauvegardé → results/shap_waterfall_patient0.png")
-
-# ---- Graphique SHAP 4 : Force Plot global ----
-# Version condensée du waterfall pour visualiser tous les patients
-print("\n📊 Graphique 4 : SHAP Force Plot (tous les patients du test)")
-shap.initjs()
-force_plot = shap.force_plot(
-    explainer.expected_value,
-    shap_values.values,
-    X_test_scaled,
-    feature_names=feature_names,
-    show=False
-)
-shap.save_html('results/shap_force_plot.html', force_plot)
-print("   ✅ Sauvegardé → results/shap_force_plot.html  (ouvrir dans un navigateur)")
-
-# ---- Tableau SHAP : Top features les plus importantes ----
-print("\n" + "-" * 55)
-print("TOP FEATURES PAR IMPORTANCE SHAP (valeur absolue moyenne)")
-print("-" * 55)
-shap_importance = pd.DataFrame({
-    'Feature'         : feature_names,
-    'SHAP_mean_abs'   : np.abs(shap_values.values).mean(axis=0)
-}).sort_values('SHAP_mean_abs', ascending=False)
-
-for i, row in shap_importance.iterrows():
-    print(f"  {row['Feature']:<35} : {row['SHAP_mean_abs']:.4f}")
-
-
-# ============================================================
-# 10. RÉSUMÉ FINAL
+# 8. RÉSUMÉ FINAL
 # ============================================================
 print("\n" + "=" * 55)
 print("RÉSUMÉ FINAL")
 print("=" * 55)
 results = {
-    'Modèle'    : 'XGBoost + SMOTE + SHAP',
+    'Modèle'    : 'XGBoost + SMOTE',
     'Accuracy'  : f'{accuracy*100:.2f}%',
     'Precision' : f'{precision*100:.2f}%',
     'Recall'    : f'{recall*100:.2f}%',
@@ -395,12 +240,5 @@ results = {
 }
 for key, value in results.items():
     print(f"  {key:<15} : {value}")
-
-print("\n📁 Fichiers sauvegardés dans results/")
-print("   ├── xgboost_results.png          ← métriques + matrice + ROC")
-print("   ├── shap_summary_beeswarm.png    ← impact de chaque feature")
-print("   ├── shap_bar_importance.png      ← importance moyenne SHAP")
-print("   ├── shap_waterfall_patient0.png  ← explication 1 patient")
-print("   └── shap_force_plot.html         ← tous les patients (navigateur)")
 
 print("\n✅ Pipeline complet terminé avec succès !")
