@@ -2,7 +2,7 @@
 data_processing.py
 ==================
 Ce fichier contient toutes les fonctions de traitement des données.
-Il est utilisé par train_model.py et le notebook eda.ipynb.
+Il est utilisé par le flux d'evaluation et le notebook eda.ipynb.
 
 Pipeline :
     load_data() → optimize_memory() → prepare_features() → split_data() → normalize_data()
@@ -133,8 +133,7 @@ def split_data(X, y, test_size: float = 0.2, random_state: int = 42):
 
     IMPORTANT :
         - stratify=y garantit la même proportion 68/32 dans train ET test
-        - Le balance (class_weight) se fera dans train_model.py
-          UNIQUEMENT sur les données d'entraînement
+        - Le choix et l'ajustement du class_weight dependa du classifieur final
 
     Args:
         X            : Features
@@ -204,9 +203,14 @@ def normalize_data(X_train, X_test):
     # Transforme test avec les mêmes paramètres que train
     X_test_scaled = scaler.transform(X_test)
 
+    # Conserver colonnes/index pour éviter les warnings de feature names.
+    X_train_scaled = pd.DataFrame(X_train_scaled, columns=X_train.columns, index=X_train.index)
+    X_test_scaled = pd.DataFrame(X_test_scaled, columns=X_test.columns, index=X_test.index)
+
     print(f"✅ Normalisation appliquée")
-    print(f"   Moyenne train (ex age) : {X_train_scaled[:, 0].mean():.4f}")
-    print(f"   Std train    (ex age)  : {X_train_scaled[:, 0].std():.4f}")
+    first_feature = X_train.columns[0]
+    print(f"   Moyenne train (ex {first_feature}) : {X_train_scaled[first_feature].mean():.4f}")
+    print(f"   Std train    (ex {first_feature})  : {X_train_scaled[first_feature].std():.4f}")
 
     return X_train_scaled, X_test_scaled, scaler
 
