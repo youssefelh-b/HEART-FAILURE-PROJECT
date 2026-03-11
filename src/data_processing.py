@@ -275,10 +275,7 @@ def run_pipeline(path: str):
 # ============================================================
 
 if __name__ == "__main__":
-    """
-    Lance ce fichier directement pour tester la pipeline :
-        python src/data_processing.py
-    """
-    X_train, X_test, y_train, y_test, scaler = run_pipeline(
-        '../data/heart_failure_clinical_records_dataset.csv'
-    )
+    import os
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    data_path = os.path.join(base_dir, 'data', 'heart_failure_clinical_records_dataset.csv')
+    X_train, X_test, y_train, y_test, scaler = run_pipeline(data_path)
