@@ -142,8 +142,8 @@ Quatre modèles ont été entraînés et évalués :
 
 | Modèle | Script |
 |---|---|
-| Régression Logistique | `train_logistic_regression.py` |
-| Forêt Aléatoire | `train_random_forest.py` |
+| Logistic Regression | `train_logistic_regression.py` |
+| Random Forest | `train_random_forest.py` |
 | XGBoost | `train_xgboost.py` |
 | LightGBM | `train_lightgbm.py` |
 
