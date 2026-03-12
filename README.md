@@ -287,8 +287,13 @@ Voir la section dédiée ci-dessous.
 
 ## Résumé pour faire fonctionner le projet
 pip install -r requirements.txt
+
 python src/train_lightgbm.py
+
 python src/train_logistic_regression.py
+
 python src/train_random_forest.py
+
 python src/train_xgboost.py
+
 streamlit run app/app.py
