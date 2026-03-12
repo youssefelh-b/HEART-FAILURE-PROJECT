@@ -92,15 +92,14 @@ print("\n✅ Modèle xgboost entraîné !")
 # ============================================================
 # 5. SAUVEGARDER
 # ============================================================
+import json
 
-model_data = {
-    'model'   : model,
-    'scaler'  : scaler,
-    'features': X_train.columns.tolist()
-}
+# Sauvegarder le modèle XGBoost avec sa méthode native
+model_path = os.path.join(MODELS_DIR, 'xgboost.json')
+model.save_model(model_path)
 
-model_path = os.path.join(MODELS_DIR, 'xgboost.pkl')
-joblib.dump(model_data, model_path)
+# Sauvegarder scaler et features séparément
+meta_path = os.path.join(MODELS_DIR, 'xgboost_meta.pkl')
+joblib.dump({'scaler': scaler, 'features': X_train.columns.tolist()}, meta_path)
 
 print(f"✅ Modèle xgboost sauvegardé → {model_path}")
-print("\n➡️  Lance evaluate_model.py pour voir les performances !")
