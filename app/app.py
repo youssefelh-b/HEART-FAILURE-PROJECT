@@ -478,7 +478,7 @@ st.markdown("""
         <span class="team-member">Adam SABILI</span>
         <span class="team-member">Youssef ELHALLAM</span>
         <span class="team-member">Mohamed EL YAAGOUBI</span>
-        <span class="team-member">Ilyas LESSIQ</span>
+        <span class="team-member">Ilyass LESSIQ</span>
     </div>
 </div>
 """, unsafe_allow_html=True)
