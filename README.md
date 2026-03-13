@@ -142,8 +142,8 @@ Quatre modèles ont été entraînés et évalués :
 
 | Modèle | Script |
 |---|---|
-| Régression Logistique | `train_logistic_regression.py` |
-| Forêt Aléatoire | `train_random_forest.py` |
+| Logistic Regression | `train_logistic_regression.py` |
+| Random Forest | `train_random_forest.py` |
 | XGBoost | `train_xgboost.py` |
 | LightGBM | `train_lightgbm.py` |
 
@@ -287,8 +287,13 @@ Voir la section dédiée ci-dessous.
 
 ## Résumé pour faire fonctionner le projet
 pip install -r requirements.txt
+
 python src/train_lightgbm.py
+
 python src/train_logistic_regression.py
+
 python src/train_random_forest.py
+
 python src/train_xgboost.py
+
 streamlit run app/app.py
