@@ -18,9 +18,9 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from data_processing import run_pipeline
 
 
-# =========================================================
+# ==========================================
 # 0. CHEMINS
-# =========================================================
+# ==========================================
 
 BASE_DIR   = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_PATH  = os.path.join(BASE_DIR, 'data', 'heart_failure_clinical_records_dataset.csv')
