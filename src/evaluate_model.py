@@ -31,9 +31,8 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from data_processing import run_pipeline
 
 
-# ============================================================
 # CHEMINS
-# ============================================================
+
 
 BASE_DIR    = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_PATH   = os.path.join(BASE_DIR, 'data', 'heart_failure_clinical_records_dataset.csv')
@@ -50,9 +49,7 @@ MODELS = {
 }
 
 
-# ============================================================
 # 1. PRÉPARER LES DONNÉES DE TEST
-# ============================================================
 
 def get_test_data():
     """
@@ -64,9 +61,7 @@ def get_test_data():
     return X_test, y_test
 
 
-# ============================================================
 # 2. CALCULER LES MÉTRIQUES D'UN MODÈLE
-# ============================================================
 
 def evaluate_one_model(model_name, model_path, X_test, y_test):
     """
@@ -132,9 +127,7 @@ def evaluate_one_model(model_name, model_path, X_test, y_test):
     return metrics
 
 
-# ============================================================
 # 3. AFFICHER LE TABLEAU DE COMPARAISON
-# ============================================================
 
 def print_comparison_table(results):
     """
@@ -164,9 +157,7 @@ def print_comparison_table(results):
     return df
 
 
-# ============================================================
 # 4. GRAPHIQUES
-# ============================================================
 
 def plot_metrics_comparison(df, results):
     """
@@ -260,9 +251,7 @@ def plot_metrics_comparison(df, results):
     print(f"✅ Matrices de confusion sauvegardées → {path3}")
 
 
-# ============================================================
 # 5. CHOISIR LE MEILLEUR MODÈLE
-# ============================================================
 
 def choose_best_model(df, results):
     """
@@ -311,9 +300,7 @@ def choose_best_model(df, results):
     return best_name
 
 
-# ============================================================
 # MAIN
-# ============================================================
 
 if __name__ == "__main__":
 
