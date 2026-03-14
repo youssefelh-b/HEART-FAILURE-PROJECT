@@ -18,9 +18,9 @@ from sklearn.ensemble import RandomForestClassifier
 from data_processing import run_pipeline
 
 
-# ============================================================
+
 # CHEMINS
-# ============================================================
+
 
 BASE_DIR   = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_PATH  = os.path.join(BASE_DIR, 'data', 'heart_failure_clinical_records_dataset.csv')
@@ -31,9 +31,9 @@ SCALER_PATH = os.path.join(MODEL_DIR, 'scaler.pkl')
 os.makedirs(MODEL_DIR, exist_ok=True)
 
 
-# ============================================================
+
 # 1. ENTRAÎNEMENT DU MODÈLE
-# ============================================================
+
 
 def train_model(X_train, y_train) -> RandomForestClassifier:
     """
@@ -75,9 +75,8 @@ def train_model(X_train, y_train) -> RandomForestClassifier:
     return model
 
 
-# ============================================================
+
 # 2. SAUVEGARDE DU MODÈLE
-# ============================================================
 
 def save_model(model, scaler):
     """
@@ -97,9 +96,8 @@ def save_model(model, scaler):
     print(f"💾 Scaler sauvegardé  → {SCALER_PATH}")
 
 
-# ============================================================
 # 3. CHARGEMENT DU MODÈLE
-# ============================================================
+
 
 def load_model():
     """
@@ -127,9 +125,7 @@ def load_model():
     return model, scaler
 
 
-# ============================================================
 # MAIN
-# ============================================================
 
 if __name__ == "__main__":
     print("=" * 50)

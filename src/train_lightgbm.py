@@ -102,7 +102,7 @@ def save_model(model, scaler):
 
 
 # ============================================================
-# 3. CHARGEMENT DU MODÈLE
+# 3. CHARGEMENT DU MODÈLE LIGHTGBM
 # ============================================================
 
 def load_model():
