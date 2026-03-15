@@ -283,6 +283,8 @@ Voir section suivante.
 
 **Analyse :** Le prompt était efficace car il spécifiait le nom exact de la fonction, les types de conversions attendus, et le comportement de logging. La précision des instructions a éliminé les allers-retours et produit un code directement intégrable.
 
+# Trello link to join as a member : https://trello.com/invite/b/69aeb0afe192dbfbceb14ba5/ATTId51b82e6b2dbd54d29ae22a66159140560F56E9A/gr-31-coding-week
+
 ---
 
 *École Centrale Casablanca · Coding Week · Mars 2026*
